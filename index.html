@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src https: http://localhost:* http://127.0.0.1:*; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Voice Helper</title>
+<meta name="description" content="For people who have trouble speaking. It listens to the conversation, suggests replies, and says the one you tap out loud.">
+<meta name="theme-color" content="#1F2A30">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <h1>Voice Helper</h1>
+  <span id="mode" class="mode">Demo</span>
+  <span class="spacer"></span>
+  <button type="button" id="startOver">New conversation</button>
+  <button type="button" id="openVoice">Use your own voice</button>
+  <button type="button" id="openSettings">Settings</button>
+</header>
+
+<p id="demoNote" class="note">This is a demo with a made-up conversation. Tap <strong>Next line</strong>, then tap a reply. Set it up in Settings and it listens to the real conversation and suggests replies that fit.</p>
+
+<main>
+  <!-- What has been said so far -->
+  <div id="talk" class="talk" role="log" aria-label="Conversation" tabindex="0"></div>
+
+  <!-- What the other person says -->
+  <div class="row hear">
+    <button type="button" id="listen" class="listen">Start listening</button>
+    <button type="button" id="demoNext" class="primary">Next line</button>
+    <input id="heard" type="text" maxlength="400" autocomplete="off" placeholder="Or type what they said" aria-label="Type what the other person said">
+    <button type="button" id="heardAdd">Add</button>
+  </div>
+
+  <!-- Replies to choose from -->
+  <div id="replies" class="replies" role="group" aria-label="Replies to choose from"></div>
+  <p id="status" class="status" role="status" aria-live="polite"></p>
+
+  <!-- Steering the replies -->
+  <div class="steer-row">
+    <span id="steerLabel">Steer the replies</span>
+    <div id="steers" class="steers" role="group" aria-labelledby="steerLabel"></div>
+  </div>
+  <div class="row">
+    <input id="hint" type="text" maxlength="160" autocomplete="off" placeholder="Type a word or two of what you want to say" aria-label="Type a word or two of what you want to say">
+    <button type="button" id="suggest">Suggest</button>
+    <button type="button" id="sayTyped" class="primary">Say this</button>
+  </div>
+</main>
+
+<noscript><p class="note">Voice Helper needs JavaScript to run.</p></noscript>
+
+<!-- Settings -->
+<dialog id="settingsDialog" aria-labelledby="settingsTitle">
+  <h2 id="settingsTitle">Settings</h2>
+
+  <h3>Where replies come from</h3>
+  <label class="field">Claude or Other
+    <select id="provider">
+      <option value="claude">Claude</option>
+      <option value="other">Other</option>
+    </select>
+  </label>
+  <p id="claudeHelp" class="hint">You use your own Anthropic API key, and you pay Anthropic for what you use. Make a key just for this, on an account with only a little credit and automatic top-ups off, at <a href="https://platform.claude.com/" target="_blank" rel="noopener">platform.claude.com</a>.</p>
+  <div id="otherHelp" hidden>
+    <p class="hint">Any service or program that answers in the common "chat completions" format. That includes free models running on this computer, which need no key. Only type an address you trust.</p>
+    <label class="field">Address
+      <input id="address" type="url" inputmode="url" autocomplete="off" spellcheck="false" autocapitalize="off" maxlength="200" placeholder="http://localhost:11434/v1">
+    </label>
+  </div>
+  <label class="field"><span id="keyLabel">API key</span>
+    <input id="key" type="password" autocomplete="new-password" data-1p-ignore data-lpignore="true" spellcheck="false" autocapitalize="off" maxlength="300">
+  </label>
+  <label class="check"><input id="remember" type="checkbox"> Remember it on this device</label>
+  <p class="hint">Left off, the key is forgotten when you close the page. Turned on, it is kept in this browser, where other pages at the same web address could read it.</p>
+  <p id="goesTo" class="hint"></p>
+  <div class="row">
+    <button type="button" id="keyUse" class="primary">Use this key</button>
+    <button type="button" id="keyForget" class="danger">Forget key</button>
+  </div>
+  <p id="keyStatus" class="hint" role="status"></p>
+
+  <label class="field">Model
+    <select id="model" disabled><option value="">Add a key to see the list</option></select>
+  </label>
+  <label class="field" id="modelTypedRow" hidden>Model name
+    <input id="modelTyped" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" maxlength="100">
+  </label>
+  <p class="hint">Smaller models answer faster and cost less. In a conversation, speed matters most.</p>
+
+  <h3>About me</h3>
+  <label class="field">Anything that helps the replies sound like you
+    <textarea id="about" maxlength="600" rows="3" placeholder="For example: I am 70, dry sense of humor. My daughter is Ana. I like baseball and hate small talk."></textarea>
+  </label>
+  <p class="hint">Kept on this device. Sent with each request.</p>
+
+  <h3>Voice</h3>
+  <p class="hint">The device's voice. It is also the stand-in whenever your own voice cannot be reached.</p>
+  <label class="field">Voice
+    <select id="voice"></select>
+  </label>
+  <label class="field">Speed
+    <input id="rate" type="range" min="0.5" max="1.5" step="0.05">
+  </label>
+  <button type="button" id="tryVoice">Try it</button>
+
+  <h3>Keyboard</h3>
+  <label class="check"><input id="numberKeys" type="checkbox"> Number keys 1 to 6 say a reply</label>
+  <p class="hint">For a keyboard, or a switch set up to press keys. Turn it off if keys get pressed by accident.</p>
+
+  <h3>Please read</h3>
+  <p class="hint"><strong>Tell people the device is listening.</strong> Once you start it, the microphone stays on for the whole conversation. It is covered only while the device is speaking. Your browser turns what it hears into text, and its maker may do that on its own servers. The words then go to Claude, or to the address you chose under Other, to get replies. What those companies do with what they receive is up to their own terms and privacy policies.</p>
+  <p class="hint">This page never saves the conversation. It is gone when you close the page. Each thing it hears sends one request. If nobody taps for a while it keeps listening but stops asking for replies, so a television cannot run up a bill.</p>
+  <p class="hint">This is a hobby project. It has not been reviewed, cleared or tested as a medical device. The replies are guesses, so read before you tap.</p>
+  <p class="hint">The code is MIT licensed: <a href="https://github.com/markpikemarkpike/voice-helper" target="_blank" rel="noopener">github.com/markpikemarkpike/voice-helper</a></p>
+
+  <div class="row end"><button type="button" id="settingsClose" class="primary">Close</button></div>
+</dialog>
+
+<!-- Your own voice -->
+<dialog id="voiceDialog" aria-labelledby="voiceTitle">
+  <h2 id="voiceTitle">Use your own voice</h2>
+  <p class="hint">If you banked your voice at ElevenLabs, or had a copy made there from old recordings, replies can be spoken in it. You use your own API key. Make one just for this, limited to text to speech and reading voices, with a credit limit.</p>
+  <label class="field">ElevenLabs API key
+    <input id="voiceKey" type="password" autocomplete="new-password" data-1p-ignore data-lpignore="true" spellcheck="false" autocapitalize="off" maxlength="300">
+  </label>
+  <label class="check"><input id="voiceRemember" type="checkbox"> Remember it on this device</label>
+  <p class="hint">Turned on, other pages at the same web address could read it.</p>
+  <div class="row">
+    <button type="button" id="voiceUse" class="primary">Connect</button>
+    <button type="button" id="voiceForget" class="danger">Disconnect</button>
+  </div>
+  <p id="voiceStatus" class="hint" role="status"></p>
+
+  <label class="field">Your voice
+    <select id="ownVoice" disabled><option value="">Connect to see your voices</option></select>
+  </label>
+  <button type="button" id="voiceTry">Try it</button>
+
+  <h3>Please read</h3>
+  <p class="hint">The words of each reply you tap are sent to ElevenLabs, which sends back the sound. That uses credit on your account. If it cannot be reached, the device's voice speaks.</p>
+  <p class="hint"><strong>Only use a voice that is yours, or that you have permission to use.</strong> This page does not record, copy or keep anyone's voice.</p>
+  <p class="hint">As far as I can tell, Apple's Personal Voice works in apps but not on web pages. This project is not affiliated with or endorsed by ElevenLabs.</p>
+
+  <div class="row end"><button type="button" id="voiceClose" class="primary">Close</button></div>
+</dialog>
+
+<script src="core.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

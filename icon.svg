@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Voice Helper">
+  <rect width="512" height="512" rx="112" fill="#1F2A30"/>
+  <path d="M120 132h200a36 36 0 0 1 36 36v96a36 36 0 0 1-36 36H212l-60 52v-52h-32a36 36 0 0 1-36-36v-96a36 36 0 0 1 36-36z" fill="#fff"/>
+  <path d="M392 176a104 104 0 0 1 0 128M432 140a160 160 0 0 1 0 200" fill="none" stroke="#A5E3C5" stroke-width="28" stroke-linecap="round"/>
+</svg>
