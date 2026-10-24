@@ -4,7 +4,7 @@
 
 ![Voice Helper on a tablet, in demo mode. At the top, a short conversation: someone says they brought soup and asks whether to warm it up. Below are six large reply buttons, such as Yes please, that sounds wonderful, and Maybe later, I am not hungry yet. Along the bottom are buttons to steer the replies, such as Yes, No and Ask a question, and a box for typing a word or two.](docs/screen.png)
 
-**Try the demo: [markpikemarkpike.github.io/voice-helper](https://markpikemarkpike.github.io/voice-helper/)**
+**Try the demo: [voice-helper-demo.vercel.app](https://voice-helper-demo.vercel.app)**
 
 ---
 
@@ -55,7 +55,7 @@ The link above opens in demo mode. The conversation and the replies are a script
 
 ## Using it for real
 
-I don't run a working copy for everyone. Something has to write the replies, and you choose what. In **Settings**, under **Where replies come from**, pick **Claude** or **Other**.
+The page at that link is the whole app. It just has nothing behind it until you set it up. Something has to write the replies, and you choose what. In **Settings**, under **Where replies come from**, pick **Claude** or **Other**.
 
 ### With Claude
 
@@ -106,13 +106,13 @@ There are no accounts, no ads, no cookies and no tracking. I run no server and c
 | About me | Kept in your browser. Sent along with each request. |
 | Your ElevenLabs key, if you set up your own voice | Same rules as the other key. It is sent only to ElevenLabs. |
 | The words of each reply you tap, if you set up your own voice | Sent to ElevenLabs, which sends back the sound. The sound is played and not kept. The rest of the conversation is not sent there. |
-| The page itself | Served by GitHub, which sees your internet address, as any website does. |
+| The page itself | My copy is served by Vercel, which sees your internet address, as any website does. |
 
 A voice marked "needs internet" in Settings sends the words to whoever makes that voice.
 
-What Anthropic, ElevenLabs, GitHub, your browser's maker and anyone you choose under Other do with what they receive is up to their own terms and privacy policies. This page has no say in it.
+What Anthropic, ElevenLabs, Vercel, your browser's maker and anyone you choose under Other do with what they receive is up to their own terms and privacy policies. This page has no say in it.
 
-**About remembering a key.** Other pages hosted at the same web address could read a remembered key. That is true of my copy and of any copy you host beside other sites. Leaving the box unticked is safer. An account with only a little credit on it caps the damage either way.
+**About remembering a key.** Other pages hosted at the same web address could read a remembered key. That matters if you host a copy beside other sites. Leaving the box unticked is safer. An account with only a little credit on it caps the damage either way.
 
 ## Changing the code
 
@@ -132,7 +132,7 @@ To run it on your own computer:
 python3 -m http.server 8000
 ```
 
-Then open `http://localhost:8000`. Edit a file, save, reload. Browsers only allow the microphone on `localhost` or over HTTPS.
+Then open `http://localhost:8000`. Edit a file, save, reload. Some browsers only allow the microphone on `localhost` or over HTTPS, so do this if listening won't start from the file.
 
 `test.js` covers `core.js` only. `app.js` has no tests in this repo.
 
@@ -140,7 +140,7 @@ No model is named anywhere in the code. The page asks the service which models y
 
 The wording that shapes the replies is `SYSTEM` in `core.js`. It's plain English. Change it and see what happens.
 
-To put up your own copy, fork this repo and turn on GitHub Pages in Settings. Never put a key in the code.
+To put up your own copy on the web, fork this repo. In your copy, open **Settings**, then **Pages**, pick the **main** branch and save. GitHub shows you the address a minute or two later. Never put a key in the code.
 
 ## Ways to make it better
 
